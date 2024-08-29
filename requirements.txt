@@ -1,0 +1,8 @@
+scikit-learn
+pystac-client
+tqdm
+geopandas
+pandas
+galah-python
+rasterio
+gdal=3.9.1
