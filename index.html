@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Spectral Botany example</title>
+    <style>
+        body {
+            text-align: center;
+            font-family: Arial, sans-serif;
+        }
+
+        .map-container {
+            display: inline-block;
+            margin: 20px;
+            width: 400px;
+            height: 400px;
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Casuarina cristata</h1>
+    <p>Maps: Landsat 8 imagery, Segmented PCA of Brigalow Belt, Predicted Casuarina cristata occurrences</p>
+
+    <div class="map-container">
+        <iframe src="https://github.com/t-hackwood/SpectralBotany/blob/08afd3da61d9f5f47be82905cf3fece4dc9fd3ff/LandsatBarest_brigalow.html"></iframe>
+    </div>
+    <div class="map-container">
+        <iframe src="https://github.com/t-hackwood/SpectralBotany/blob/08afd3da61d9f5f47be82905cf3fece4dc9fd3ff/segmentationRGB.html"></iframe>
+    </div>
+    <div class="map-container">
+        <iframe src="https://github.com/t-hackwood/SpectralBotany/blob/08afd3da61d9f5f47be82905cf3fece4dc9fd3ff/CasuarinaCastata_prob.html"></iframe>
+    </div>
+
+</body>
+</html>
