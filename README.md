@@ -6,4 +6,4 @@ derived from multispectral remote sensing imagery, Landsat-8 in this case, to pr
 
 Pictured below is the predicted probability of occurance for *Casuarina cristata* over the Souther Brigalow Belt bioregion in Queensland, Australia.
 
-[CasuarinaCristata]:https://github.com/t-hackwood/SpectralBotany/blob/7d4faa5ec35538c31d305f2d03278f6e0a473753/data/CasuarinaCristataPredicted.png
+![CasuarinaCristata](https://github.com/t-hackwood/SpectralBotany/blob/7d4faa5ec35538c31d305f2d03278f6e0a473753/data/CasuarinaCristataPredicted.png)
