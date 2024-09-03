@@ -8,4 +8,4 @@ Interactive examples can be viewed [**here**](https://t-hackwood.github.io/Spect
 
 Pictured below is the predicted probability of occurrence for *Casuarina cristata* over the Souther Brigalow Belt bioregion in Queensland, Australia.
 
-![CasuarinaCristata](https://github.com/t-hackwood/SpectralBotany/blob/7d4faa5ec35538c31d305f2d03278f6e0a473753/data/CasuarinaCristataPredicted.png)
+![CasuarinaCristata](https://github.com/t-hackwood/SpectralBotany/blob/main/data/CasuarinaCristataPredicted.png)
