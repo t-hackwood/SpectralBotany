@@ -23,10 +23,15 @@ def _vegIndices(info, inputs, outputs, otherargs):
     ndwistack = []
 
     for img in s2:
+        
+        nodata = np.any(img == otherargs.noData, axis=0)
 
         inshape = img.shape
         ndvi = (img[3]-img[2])/(img[3]+img[2]+np.finfo(float).eps).reshape(1, inshape[1], inshape[2])
         ndwi = (img[1]-img[5])/(img[1]+img[5]+np.finfo(float).eps).reshape(1, inshape[1], inshape[2])
+        
+        ndvi[:,nodata] = np.nan
+        ndwistack[:,nodata] = np.nan
             
         # Stack these ratios with the original data
         ndvistack.append(ndvi)
@@ -36,17 +41,20 @@ def _vegIndices(info, inputs, outputs, otherargs):
     ndwistack = np.stack(ndwistack, axis=0)
 
     # Get new stack with 5th, 50th and 95th percentiles and standard deviation
-    ndviStats = np.percentile(ndvistack, [5, 50, 95], axis=0)
+    ndviStats = np.nanpercentile(ndvistack, [5, 50, 95], axis=0)
     ndviStats = np.squeeze(ndviStats)
-    ndviSTD = np.std(ndvistack, axis=0)
+    ndviSTD = np.nanstd(ndvistack, axis=0)
     ndvirange = np.max(ndvistack, axis=0) - np.min(ndvistack, axis=0)
     ndviStack = np.vstack([ndviStats, ndviSTD, ndvirange])
 
-    ndwiStats = np.percentile(ndwistack, [5, 50, 95], axis=0)
+    ndwiStats = np.nanpercentile(ndwistack, [5, 50, 95], axis=0)
     ndwiStats = np.squeeze(ndwiStats)
-    ndwiSTD = np.std(ndwistack, axis=0)
+    ndwiSTD = np.nanstd(ndwistack, axis=0)
     ndwirange = np.max(ndwistack, axis=0) - np.min(ndwistack, axis=0)
     ndwiStack = np.vstack([ndwiStats, ndwiSTD, ndwirange])
+    
+    # Convert nans back to no data
+    ndviStack[np.isnan(ndviStack)] = 0
 
     # rescale to 16bit
     ndviStack = 10000 * 10000 + ndviStack
@@ -66,7 +74,7 @@ noData = ds.GetRasterBand(1).GetNoDataValue()
 res = ds.GetGeoTransform()[1]
 
 # Use glob to get all .vrt files
-all_files = glob.glob("/home/tim/dentata/Sentinel2_seasonal/*.vrt")
+all_files = glob.glob("/home/tim/dentata/Sentinel2_seasonal/*.tif")
 
 # Filter the list to include only those filenames that contain the years 2019-2024
 pattern = re.compile(r'20(19|20|21|22|23)')
@@ -79,8 +87,8 @@ infiles = applier.FilenameAssociations()
 outfiles = applier.FilenameAssociations()
 
 # Setup the IO
-infiles.inlist = filelist
 infiles.aoi = "/home/tim/rubella/scripts/SpectralBotany/data/BBSaoi.tif"
+infiles.inlist = filelist
 
 outfiles.ndvi = "/home/tim/dentata/outputs/brigalow_ndvistats.tif"
 outfiles.ndwi = "/home/tim/dentata/outputs/brigalow_ndwistats.tif"
@@ -96,7 +104,7 @@ controls.windowxsize = 512
 controls.windowysize = 512
 controls.setStatsIgnore(0) #  nodata
 controls.progress = cuiprogress.CUIProgressBar()
-controls.setReferenceImage(infiles.aoi)
+controls.setReferenceImage(referenceImage="aoi")
 controls.setFootprintType("BOUNDS_FROM_REFERENCE")
 controls.setResampleMethod("near")
 controls.setOutputDriverName("GTIFF")

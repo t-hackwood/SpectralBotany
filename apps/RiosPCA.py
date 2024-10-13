@@ -1,12 +1,11 @@
 # Imports
-from rios import applier, cuiprogress, pixelgrid
+from rios import applier, cuiprogress, pixelgrid, fileinfo
 import numpy as np
 import os
 from osgeo import gdal, ogr, gdalconst, osr
 from sklearn.preprocessing import RobustScaler
 from sklearn.decomposition import PCA
 import joblib
-from rios import applier, cuiprogress
 import glob
 
 
@@ -59,8 +58,8 @@ infiles = applier.FilenameAssociations()
 outfiles = applier.FilenameAssociations()
 
 # Setup the IO
-infiles.raster = "/home/tim/dentata/Sentinel2_seasonal/cvmsre_qld_m202312202402_abma2.vrt"
 infiles.aoi = "/home/tim/rubella/scripts/SpectralBotany/data/BBSaoi.tif"
+infiles.raster = "/home/tim/dentata/Sentinel2_seasonal/cvmsre_qld_m202312202402_abma2.vrt"
 
 outfiles.pc = RASTER_PC
 
@@ -75,11 +74,11 @@ otherargs.noData = noData
 controls = applier.ApplierControls()
 controls.windowxsize = 512
 controls.windowysize = 512
-controls.setStatsIgnore(0) #  nodata
-controls.setReferenceImage(infiles.aoi)
-controls.progress = cuiprogress.CUIProgressBar()
-controls.setFootprintType("BOUNDS_FROM_REFERENCE")
+controls.setReferenceImage(referenceImage="aoi")
+controls.setFootprintType("INTERSECTION")
 controls.setResampleMethod("near")
+controls.setStatsIgnore(0) #  nodata
+controls.progress = cuiprogress.CUIProgressBar()
 controls.setOutputDriverName("GTIFF")
 controls.setCreationOptions(["COMPRESS=DEFLATE",
                                 "ZLEVEL=9",
