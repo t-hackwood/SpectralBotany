@@ -166,3 +166,7 @@ cython_debug/
 
 # Saved model files
 *.pkl
+data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v2.json
+data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols.json
+data/Sentinel/Sentinel_brigalow_PCA_v2_hull_vols.json
+notebooks/SpectralBotany.code-workspace
