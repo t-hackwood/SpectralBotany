@@ -141,10 +141,10 @@ noData = ds.GetRasterBand(1).GetNoDataValue()
 res = ds.GetGeoTransform()[1]
 
 # Use glob to get all .vrt files
-all_files = glob.glob("/home/tim/dentata/Sentinel2_seasonal/*_brig.tif")
+all_files = glob.glob("/home/tim/dentata/Sentinel2_seasonal/*.tif")
 
 # Filter the list to include only those filenames that contain the years 2019-2024
-pattern = re.compile(r'20(19|20|21|22|23)')
+pattern = re.compile(r'20(19|20|21|22|23|24)')
 filelist = [f for f in all_files if pattern.search(f)]
 
 print(filelist)
@@ -172,7 +172,7 @@ controls.windowysize = 512
 controls.setStatsIgnore(0) #  nodata
 controls.progress = cuiprogress.CUIProgressBar()
 controls.setReferenceImage(referenceImage="aoi")
-controls.setFootprintType("INTERSECTION")
+controls.setFootprintType("BOUNDS_FROM_REFERENCE")
 controls.setResampleMethod("near")
 controls.setOutputDriverName("GTIFF")
 controls.setCreationOptions(["COMPRESS=DEFLATE",
@@ -189,9 +189,9 @@ controls.setCreationOptions(["COMPRESS=DEFLATE",
 conc = applier.ConcurrencyStyle(numReadWorkers=3,
                                 numComputeWorkers=2,
                                 computeWorkerKind="CW_THREADS",
-                                readBufferPopTimeout=300,
-                                computeBufferPopTimeout=300,
-                                readBufferInsertTimeout=300
+                                readBufferPopTimeout=600,
+                                computeBufferPopTimeout=600,
+                                readBufferInsertTimeout=600
                                 )
 
 controls.setConcurrencyStyle(conc)
