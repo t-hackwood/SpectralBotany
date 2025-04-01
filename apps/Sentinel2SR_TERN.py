@@ -18,8 +18,10 @@ os.environ["GDAL_HTTP_RETRY_DELAY"] = "3"
 url = 'https://data.tern.org.au/rs/public/data/sentinel2/surface_reflectance/qld/'
 
 outDir = "/home/tim/dentata/Sentinel2_seasonal"
+if not os.path.exists(outDir):
+    os.makedirs(outDir)
 
-year = "2023"
+year = "2024"
 
 # Create the output directory if it doesn't exist
 if not os.path.exists(outDir):

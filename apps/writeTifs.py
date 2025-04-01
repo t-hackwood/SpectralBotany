@@ -40,6 +40,7 @@ for vrt in vrt_files:
     try:
         output_tif = vrt.replace(".vrt", "_brig.tif")
         gdal.Warp(output_tif, vrt, outputBounds=output_bounds, dstSRS=input_proj, callback=progress_callback)
+        print(vrt + " completed")
 
     except Exception as e:
         print(vrt + " failed")
