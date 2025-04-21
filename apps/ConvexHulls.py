@@ -5,13 +5,13 @@ from sklearn.preprocessing import StandardScaler
 import json
 import joblib
 
-SEGIDs = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_segs_2000_id.tif"
-PCA = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24.tif"
-HULLRAST = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_v3_hull_vols.tif"
+SEGIDs = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_500_id.tif"
+PCA = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2.tif"
+HULLRAST = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_v4_hull_vols.tif"
 
-# FIles for PCA and Segment outputs
-RASTER_PC = "data/Sentinel/Sentinel_brigalow_PCA_e24.tif"
-RASTER_SEG = '/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_segs_2000.kea'
+# # FIles for PCA and Segment outputs
+# RASTER_PC = "data/Sentinel/Sentinel_brigalow_PCA_e24.tif"
+RASTER_SEG = '/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_500.kea'
 
 def _getSegmentHull(info, inputs, outputs, otherargs):
     segments = inputs.segs[0]
@@ -121,45 +121,52 @@ HullVols = getSegmentHull(SEGIDs, PCA)
 print("saving hull volumes")
 HullVols_str_keys = {str(key): value for key, value in HullVols.items()}
 # Save Hull volumes to a json
-with open("/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v3.json", "w") as f:
+with open("/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v4.json", "w") as f:
     json.dump(HullVols_str_keys, f)
 
 lenhulls = len(HullVols)
 
-# Iterate through dictionary and covnert to an array
-
+# Get number of segments
 hist = rat.readColumn(RASTER_SEG, 'Histogram')
+print(len(hist))
 
+# Load convex hull dictionary
+with open('/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v4.json', 'r') as f:
+    ConvexHulls = json.load(f)
+    
+print(len(ConvexHulls))
+
+# Iterate through dictionary and covnert hull volumes to an array
 hulls = []
-for i in range(hist + 1):
+for i in range(0, len(hist)):
     key = str(i)
-    if key in HullVols:
-        hulls.append(HullVols[key][0])
+    if key in ConvexHulls:
+        hulls.append(ConvexHulls[key][0])
     else:
         hulls.append(65535)
         
-# rescale hulls to uint16 unless they're nodata
 hulls = np.array(hulls)
 maxval = np.max(hulls[hulls != 65535])
 minval = np.min(hulls[hulls != 65535])
-zeroval = hulls[hulls == 0]
-hullsrescaled = np.where(hulls == 65535, 65535, (hulls - minval) / (maxval - minval) * 10000).astype(np.uint16)
-hullsrescaled[hulls == 0] = 65535
+# Set no data values to 65535
+hulls[hulls == 0] = 65535
+
+print(maxval, minval)
 
 # Write the hulls to the segmentation
 print('Writing Hulls to Segmentation')
-rat.writeColumn(RASTER_SEG, 'hulls_v3', hullsrescaled)
+rat.writeColumn(RASTER_SEG, 'convex_hulls', hulls)
 
 print('Exporting Segmentation')
 infiles = applier.FilenameAssociations()
 outfiles = applier.FilenameAssociations()   
 infiles.image = RASTER_SEG
-outfiles.var = RASTER_SEG.replace('.kea', '_hulls_v3.tif')
+outfiles.var = RASTER_SEG.replace('.kea', '_hulls_v4.tif')
 
 otherargs = applier.OtherInputs()
 # Using a loop to read and store each 0 column into otherargs
 setattr(otherargs, 'hulls', 
-            np.array(rat.readColumn(infiles.image, 'hulls_v3')).astype(np.uint16))
+            np.array(rat.readColumn(infiles.image, 'convex_hulls')).astype(np.uint16))
 
 otherargs.noData = 65535
 controls = applier.ApplierControls()
