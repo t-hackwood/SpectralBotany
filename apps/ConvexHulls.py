@@ -5,13 +5,14 @@ from sklearn.preprocessing import StandardScaler
 import json
 import joblib
 
-SEGIDs = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_500_id.tif"
+SEGIDs = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_2000_id.tif"
+
 PCA = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2.tif"
-HULLRAST = "/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_v4_hull_vols.tif"
+
 
 # # FIles for PCA and Segment outputs
 # RASTER_PC = "data/Sentinel/Sentinel_brigalow_PCA_e24.tif"
-RASTER_SEG = '/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_500.kea'
+RASTER_SEG = '/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_v2_segs_2000.kea'
 
 def _getSegmentHull(info, inputs, outputs, otherargs):
     segments = inputs.segs[0]
@@ -121,7 +122,7 @@ HullVols = getSegmentHull(SEGIDs, PCA)
 print("saving hull volumes")
 HullVols_str_keys = {str(key): value for key, value in HullVols.items()}
 # Save Hull volumes to a json
-with open("/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v4.json", "w") as f:
+with open("/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v5.json", "w") as f:
     json.dump(HullVols_str_keys, f)
 
 lenhulls = len(HullVols)
@@ -131,7 +132,7 @@ hist = rat.readColumn(RASTER_SEG, 'Histogram')
 print(len(hist))
 
 # Load convex hull dictionary
-with open('/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v4.json', 'r') as f:
+with open('/home/tim/rubella/scripts/SpectralBotany/data/Sentinel/Sentinel_brigalow_PCA_e24_hull_vols_v5.json', 'r') as f:
     ConvexHulls = json.load(f)
     
 print(len(ConvexHulls))
@@ -161,7 +162,7 @@ print('Exporting Segmentation')
 infiles = applier.FilenameAssociations()
 outfiles = applier.FilenameAssociations()   
 infiles.image = RASTER_SEG
-outfiles.var = RASTER_SEG.replace('.kea', '_hulls_v4.tif')
+outfiles.var = RASTER_SEG.replace('.kea', '_hulls_v5.tif')
 
 otherargs = applier.OtherInputs()
 # Using a loop to read and store each 0 column into otherargs
@@ -189,7 +190,6 @@ def exportColor(info, inputs, outputs, otherargs):
     data = inputs.image.flatten()
     # Access b1 through b3 from otherargs using a loop instead of individual lines
     rgb = getattr(otherargs, 'hulls')[data]
-    print(rgb.shape)
     outputs.var = rgb.reshape(inputs.image.shape).astype(np.uint16)
 
 applier.apply(exportColor, infiles, outfiles, otherargs, controls=controls)
